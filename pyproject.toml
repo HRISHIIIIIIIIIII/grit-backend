@@ -40,6 +40,9 @@ package = false
 asyncio_mode = "auto"
 testpaths = ["tests"]
 pythonpath = ["."]
+filterwarnings = [
+    "ignore:Accessing argon2.__version__ is deprecated:DeprecationWarning",
+]
 
 [tool.ruff]
 line-length = 100
