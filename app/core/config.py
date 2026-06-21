@@ -7,9 +7,10 @@ All settings are prefixed with ``GRIT_`` (see ``.env.example``). A single cached
 from __future__ import annotations
 
 from functools import lru_cache
+from typing import Annotated
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -37,8 +38,11 @@ class Settings(BaseSettings):
     celery_broker_url: str = "redis://localhost:6379/1"
     celery_result_backend: str = "redis://localhost:6379/2"
 
-    # CORS
-    cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+    # CORS — NoDecode stops pydantic-settings from JSON-decoding the env value so
+    # our comma-split validator can handle plain "a,b,c" strings.
+    cors_origins: Annotated[list[str], NoDecode] = Field(
+        default_factory=lambda: ["http://localhost:3000"]
+    )
 
     @field_validator("cors_origins", mode="before")
     @classmethod
