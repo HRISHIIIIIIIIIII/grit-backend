@@ -32,7 +32,9 @@ def get_sync_engine() -> Engine:
 def get_sync_sessionmaker() -> sessionmaker[Session]:
     global _sessionmaker
     if _sessionmaker is None:
-        _sessionmaker = sessionmaker(bind=get_sync_engine(), expire_on_commit=False, autoflush=False)
+        _sessionmaker = sessionmaker(
+            bind=get_sync_engine(), expire_on_commit=False, autoflush=False
+        )
     return _sessionmaker
 
 

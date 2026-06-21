@@ -9,17 +9,16 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 
-import pytest
-import pytest_asyncio
-from httpx import ASGITransport, AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.pool import StaticPool
-
 # Import models so their tables register on Base.metadata.
 import app.models  # noqa: F401
+import pytest
+import pytest_asyncio
 from app.db.base import Base
 from app.db.session import get_session
 from app.main import app as fastapi_app
+from httpx import ASGITransport, AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import StaticPool
 
 
 @pytest_asyncio.fixture
@@ -65,9 +64,8 @@ async def client(engine: object) -> AsyncIterator[AsyncClient]:
 @pytest.fixture(autouse=True)
 def _fast_argon2(monkeypatch: pytest.MonkeyPatch) -> None:
     """Speed up argon2 hashing in tests with low cost parameters."""
-    from passlib.context import CryptContext
-
     import app.core.security as security
+    from passlib.context import CryptContext
 
     ctx = CryptContext(
         schemes=["argon2"],
