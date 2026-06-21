@@ -73,9 +73,7 @@ async def leaderboard(session: AsyncSession, user: User, scope: str) -> Board:
         if user.id not in {u.id for u in members}:
             members.append(user)
         since = _week_start_utc(user)
-        weekly = await community_repo.weekly_xp_for_users(
-            session, [u.id for u in members], since
-        )
+        weekly = await community_repo.weekly_xp_for_users(session, [u.id for u in members], since)
         return _rank([(u, weekly.get(u.id, 0)) for u in members], user.id)
 
     # global (default) — all-time xp_total.
@@ -105,9 +103,7 @@ async def list_friends(
     session: AsyncSession, user: User
 ) -> tuple[list[FriendRead], list[FriendRead], list[FriendRead]]:
     friendships = await community_repo.friendships_for(session, user.id)
-    other_ids = [
-        f.friend_id if f.user_id == user.id else f.user_id for f in friendships
-    ]
+    other_ids = [f.friend_id if f.user_id == user.id else f.user_id for f in friendships]
     others = await community_repo.users_by_ids(session, other_ids)
 
     friends: list[FriendRead] = []
@@ -137,9 +133,7 @@ async def send_request(session: AsyncSession, user: User, email: str) -> Friends
     if await community_repo.existing_friendship(session, user.id, target.id):
         raise ConflictError("A friendship or request already exists", code="already_friends")
 
-    friendship = Friendship(
-        user_id=user.id, friend_id=target.id, status=FriendshipStatus.PENDING
-    )
+    friendship = Friendship(user_id=user.id, friend_id=target.id, status=FriendshipStatus.PENDING)
     session.add(friendship)
     await session.flush()
     return friendship

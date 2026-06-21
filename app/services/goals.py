@@ -73,9 +73,7 @@ async def create_goal(session: AsyncSession, user: User, payload: GoalCreate) ->
     return await _require_goal(session, goal.id, user)
 
 
-async def update_goal(
-    session: AsyncSession, user: User, goal_id: int, payload: GoalUpdate
-) -> Goal:
+async def update_goal(session: AsyncSession, user: User, goal_id: int, payload: GoalUpdate) -> Goal:
     goal = await _require_goal(session, goal_id, user)
     data = payload.model_dump(exclude_unset=True)
     habit_ids = data.pop("habit_ids", None)

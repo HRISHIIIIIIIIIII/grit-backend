@@ -39,9 +39,7 @@ class Achievement(Base):
 
 class UserAchievement(Base):
     __tablename__ = "user_achievements"
-    __table_args__ = (
-        UniqueConstraint("user_id", "achievement_id", name="uq_user_achievement"),
-    )
+    __table_args__ = (UniqueConstraint("user_id", "achievement_id", name="uq_user_achievement"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[int] = mapped_column(

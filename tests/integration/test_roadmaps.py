@@ -26,9 +26,7 @@ async def _auth(client: AsyncClient) -> dict[str, str]:
 
 async def test_import_creates_phases_and_topics(client: AsyncClient) -> None:
     h = await _auth(client)
-    resp = await client.post(
-        "/api/v1/roadmaps/import", headers=h, json={"markdown": MD}
-    )
+    resp = await client.post("/api/v1/roadmaps/import", headers=h, json={"markdown": MD})
     assert resp.status_code == 201
     body = resp.json()
     assert body["title"] == "Python DSA"
@@ -40,9 +38,7 @@ async def test_import_creates_phases_and_topics(client: AsyncClient) -> None:
 
 async def test_toggle_topic_awards_xp_and_progress(client: AsyncClient) -> None:
     h = await _auth(client)
-    detail = (
-        await client.post("/api/v1/roadmaps/import", headers=h, json={"markdown": MD})
-    ).json()
+    detail = (await client.post("/api/v1/roadmaps/import", headers=h, json={"markdown": MD})).json()
     roadmap_id = detail["id"]
     topic_id = detail["phases"][0]["topics"][0]["id"]
 

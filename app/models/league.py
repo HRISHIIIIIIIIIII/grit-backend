@@ -31,9 +31,7 @@ class League(Base, TimestampMixin):
 
 class LeaderboardEntry(Base):
     __tablename__ = "leaderboard_entries"
-    __table_args__ = (
-        UniqueConstraint("league_id", "user_id", name="uq_league_user"),
-    )
+    __table_args__ = (UniqueConstraint("league_id", "user_id", name="uq_league_user"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
     league_id: Mapped[int] = mapped_column(

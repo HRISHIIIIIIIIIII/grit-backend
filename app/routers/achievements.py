@@ -43,8 +43,6 @@ def _to_read(achievement: Achievement, link: UserAchievement) -> AchievementRead
 
 
 @router.get("", response_model=list[AchievementRead])
-async def list_achievements(
-    current_user: CurrentUser, session: DbSession
-) -> list[AchievementRead]:
+async def list_achievements(current_user: CurrentUser, session: DbSession) -> list[AchievementRead]:
     rows = await achievement_service.list_with_progress(session, current_user)
     return [_to_read(a, link) for a, link in rows]

@@ -52,31 +52,52 @@ HABITS: list[tuple[str, HabitCategory, int, int, bool]] = [
 
 GOALS: list[tuple[str, str, str, list[tuple[str, bool]]]] = [
     (
-        "Run a half marathon", "🏃", "#0B7A5E",
-        [("5km without stopping", True), ("10km run", True), ("15km long run", True),
-         ("18km long run", False), ("Race day", False)],
+        "Run a half marathon",
+        "🏃",
+        "#0B7A5E",
+        [
+            ("5km without stopping", True),
+            ("10km run", True),
+            ("15km long run", True),
+            ("18km long run", False),
+            ("Race day", False),
+        ],
     ),
     (
-        "Read 24 books", "📚", "#2563EB",
-        [("Books 1-6", True), ("Books 7-12", True), ("Books 13-15", True),
-         ("Books 16-20", False), ("Books 21-24", False)],
+        "Read 24 books",
+        "📚",
+        "#2563EB",
+        [
+            ("Books 1-6", True),
+            ("Books 7-12", True),
+            ("Books 13-15", True),
+            ("Books 16-20", False),
+            ("Books 21-24", False),
+        ],
     ),
     (
-        "Ship side project", "🚀", "#7C3AED",
-        [("Design", True), ("MVP build", True), ("Beta", False), ("Launch", False),
-         ("First users", False)],
+        "Ship side project",
+        "🚀",
+        "#7C3AED",
+        [
+            ("Design", True),
+            ("MVP build", True),
+            ("Beta", False),
+            ("Launch", False),
+            ("First users", False),
+        ],
     ),
     (
-        "Meditate 100 days", "🧘", "#0E7490",
+        "Meditate 100 days",
+        "🧘",
+        "#0E7490",
         [("25 days", True), ("50 days", True), ("75 days", False), ("100 days", False)],
     ),
 ]
 
 
 def _purge_existing(session: Session) -> None:
-    existing = session.execute(
-        select(User).where(User.email == DEMO_EMAIL)
-    ).scalar_one_or_none()
+    existing = session.execute(select(User).where(User.email == DEMO_EMAIL)).scalar_one_or_none()
     if existing is not None:
         session.execute(delete(User).where(User.id == existing.id))
         session.flush()
@@ -145,9 +166,7 @@ def _import_roadmaps(session: Session, user: User) -> Roadmap | None:
     return dsa_roadmap
 
 
-def _create_habits_and_checkins(
-    session: Session, user: User, dsa_roadmap: Roadmap | None
-) -> int:
+def _create_habits_and_checkins(session: Session, user: User, dsa_roadmap: Roadmap | None) -> int:
     today = local_date(user.timezone)
     xp_from_checkins = 0
     active_dates: set[date] = set()
@@ -183,17 +202,17 @@ def _create_habits_and_checkins(
 
     # Recompute and persist the streak cache from the back-filled history.
     state = recompute_streak(active_dates, today)
-    streak = session.execute(
-        select(Streak).where(Streak.user_id == user.id)
-    ).scalar_one()
+    streak = session.execute(select(Streak).where(Streak.user_id == user.id)).scalar_one()
     streak.current_daily = state.current_daily
     streak.longest = state.longest
     streak.weekly_count = state.weekly_count
     streak.monthly_count = state.monthly_count
     streak.freeze_balance = state.freeze_balance
     session.flush()
-    print(f"  • streak: current={state.current_daily} longest={state.longest} "
-          f"freezes={state.freeze_balance}")
+    print(
+        f"  • streak: current={state.current_daily} longest={state.longest} "
+        f"freezes={state.freeze_balance}"
+    )
     return xp_from_checkins
 
 
@@ -227,9 +246,7 @@ def _finalise_xp(session: Session, user: User, xp_from_checkins: int) -> None:
     """Top up to the target XP with a single balancing streak-bonus event."""
     balance = TARGET_XP - xp_from_checkins
     if balance > 0:
-        session.add(
-            XpEvent(user_id=user.id, amount=balance, reason=XpReason.STREAK_BONUS)
-        )
+        session.add(XpEvent(user_id=user.id, amount=balance, reason=XpReason.STREAK_BONUS))
     user.xp_total = max(TARGET_XP, xp_from_checkins)
     session.flush()
 

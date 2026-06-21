@@ -54,9 +54,7 @@ async def friendships_for(session: AsyncSession, user_id: int) -> list[Friendshi
     return list((await session.execute(stmt)).scalars().all())
 
 
-async def existing_friendship(
-    session: AsyncSession, a: int, b: int
-) -> Friendship | None:
+async def existing_friendship(session: AsyncSession, a: int, b: int) -> Friendship | None:
     stmt = select(Friendship).where(
         or_(
             (Friendship.user_id == a) & (Friendship.friend_id == b),

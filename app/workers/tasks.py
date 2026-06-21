@@ -133,9 +133,7 @@ def _run_streak_recompute(session: Session, user_id: int, now: datetime) -> None
     active = _active_dates(session, user_id)
     state = recompute_streak(active, today)
 
-    streak = session.execute(
-        select(Streak).where(Streak.user_id == user_id)
-    ).scalar_one_or_none()
+    streak = session.execute(select(Streak).where(Streak.user_id == user_id)).scalar_one_or_none()
     if streak is None:
         streak = Streak(user_id=user_id)
         session.add(streak)
@@ -169,9 +167,7 @@ def _run_streak_protection(session: Session, user_id: int, now: datetime) -> Non
     if _checked_in_today(session, user_id, today):
         return  # day already secured
 
-    streak = session.execute(
-        select(Streak).where(Streak.user_id == user_id)
-    ).scalar_one_or_none()
+    streak = session.execute(select(Streak).where(Streak.user_id == user_id)).scalar_one_or_none()
     current = streak.current_daily if streak else 0
     if current <= 0:
         return
@@ -214,17 +210,13 @@ def _monthly_checkins(session: Session, user_id: int, today: date) -> int:
     return int(count)
 
 
-def _run_review(
-    session: Session, user_id: int, now: datetime, *, monthly: bool
-) -> None:
+def _run_review(session: Session, user_id: int, now: datetime, *, monthly: bool) -> None:
     found = _user_with_settings(session, user_id)
     if found is None:
         return
     user, settings = found
     today = local_date(user.timezone, now=now)
-    if _already_notified_today(
-        session, user_id, NotificationType.REVIEW, today, user.timezone
-    ):
+    if _already_notified_today(session, user_id, NotificationType.REVIEW, today, user.timezone):
         return
     if monthly:
         checkins = _monthly_checkins(session, user_id, today)
@@ -250,10 +242,7 @@ def _run_sweep(
     session: Session, now: datetime, enqueue: Callable[[str, int], None]
 ) -> list[tuple[int, str]]:
     prev = now - SWEEP_WINDOW
-    users_tz = [
-        (row[0], row[1])
-        for row in session.execute(select(User.id, User.timezone)).all()
-    ]
+    users_tz = [(row[0], row[1]) for row in session.execute(select(User.id, User.timezone)).all()]
     plan = plan_sweep(users_tz, prev, now)
     for user_id, trigger in plan:
         enqueue(trigger, user_id)

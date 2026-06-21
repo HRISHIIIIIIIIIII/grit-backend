@@ -24,7 +24,5 @@ async def create(session: AsyncSession, *, user: User) -> User:
 
 
 async def get_settings(session: AsyncSession, user_id: int) -> UserSettings | None:
-    result = await session.execute(
-        select(UserSettings).where(UserSettings.user_id == user_id)
-    )
+    result = await session.execute(select(UserSettings).where(UserSettings.user_id == user_id))
     return result.scalar_one_or_none()

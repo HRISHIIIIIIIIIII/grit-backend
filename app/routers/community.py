@@ -38,9 +38,7 @@ async def leaderboard(
 @router.get("/friends", response_model=FriendsList)
 async def list_friends(current_user: CurrentUser, session: DbSession) -> FriendsList:
     friends, incoming, outgoing = await community_service.list_friends(session, current_user)
-    return FriendsList(
-        friends=friends, incoming_requests=incoming, outgoing_requests=outgoing
-    )
+    return FriendsList(friends=friends, incoming_requests=incoming, outgoing_requests=outgoing)
 
 
 @router.post("/friends", response_model=FriendshipRead, status_code=status.HTTP_201_CREATED)
@@ -58,13 +56,9 @@ async def respond_friend(
     current_user: CurrentUser,
     session: DbSession,
 ) -> FriendsList:
-    await community_service.respond_request(
-        session, current_user, friendship_id, payload.accept
-    )
+    await community_service.respond_request(session, current_user, friendship_id, payload.accept)
     friends, incoming, outgoing = await community_service.list_friends(session, current_user)
-    return FriendsList(
-        friends=friends, incoming_requests=incoming, outgoing_requests=outgoing
-    )
+    return FriendsList(friends=friends, incoming_requests=incoming, outgoing_requests=outgoing)
 
 
 @router.get("/challenges", response_model=list[ChallengeRead])

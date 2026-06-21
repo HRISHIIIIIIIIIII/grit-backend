@@ -47,9 +47,7 @@ async def create_goal(
 
 
 @router.get("/{goal_id}", response_model=GoalRead)
-async def get_goal(
-    goal_id: int, current_user: CurrentUser, session: DbSession
-) -> GoalRead:
+async def get_goal(goal_id: int, current_user: CurrentUser, session: DbSession) -> GoalRead:
     goal = await goal_service.get_goal(session, current_user, goal_id)
     return _to_read(goal)
 
@@ -63,9 +61,7 @@ async def update_goal(
 
 
 @router.delete("/{goal_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_goal(
-    goal_id: int, current_user: CurrentUser, session: DbSession
-) -> None:
+async def delete_goal(goal_id: int, current_user: CurrentUser, session: DbSession) -> None:
     await goal_service.delete_goal(session, current_user, goal_id)
 
 

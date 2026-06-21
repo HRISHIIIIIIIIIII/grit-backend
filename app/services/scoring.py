@@ -61,18 +61,14 @@ async def revoke_xp_by_ref(
     return removed
 
 
-async def reverse_perfect_day_if_broken(
-    session: AsyncSession, user: User, day: date
-) -> None:
+async def reverse_perfect_day_if_broken(session: AsyncSession, user: User, day: date) -> None:
     """Remove a previously awarded perfect-day bonus if the day is no longer perfect."""
     if not await _perfect_day_already_awarded(session, user.id, day):
         return
     scheduled = await scheduled_habit_ids(session, user.id, day)
     checked = await habit_repo.checked_in_habit_ids(session, user.id, day)
     if not perfect_day_service.is_perfect_day(scheduled, checked):
-        await revoke_xp_by_ref(
-            session, user, reason=XpReason.PERFECT_DAY, ref_id=day.toordinal()
-        )
+        await revoke_xp_by_ref(session, user, reason=XpReason.PERFECT_DAY, ref_id=day.toordinal())
 
 
 async def _get_or_create_streak(session: AsyncSession, user: User) -> Streak:
@@ -105,9 +101,7 @@ async def scheduled_habit_ids(session: AsyncSession, user_id: int, day: date) ->
     return {h.id for h in habits if is_scheduled_on(h.schedule, day)}
 
 
-async def _perfect_day_already_awarded(
-    session: AsyncSession, user_id: int, day: date
-) -> bool:
+async def _perfect_day_already_awarded(session: AsyncSession, user_id: int, day: date) -> bool:
     stmt = select(XpEvent.id).where(
         XpEvent.user_id == user_id,
         XpEvent.reason == XpReason.PERFECT_DAY,
@@ -116,9 +110,7 @@ async def _perfect_day_already_awarded(
     return (await session.execute(stmt)).first() is not None
 
 
-async def maybe_award_perfect_day(
-    session: AsyncSession, user: User, day: date
-) -> XpEvent | None:
+async def maybe_award_perfect_day(session: AsyncSession, user: User, day: date) -> XpEvent | None:
     """Award the perfect-day bonus once if all scheduled habits are checked in."""
     if await _perfect_day_already_awarded(session, user.id, day):
         return None

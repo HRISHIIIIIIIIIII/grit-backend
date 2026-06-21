@@ -35,9 +35,7 @@ async def active_habits(session: AsyncSession, user_id: int) -> list[Habit]:
     return await list_for_user(session, user_id, include_archived=False)
 
 
-async def checkin_for_day(
-    session: AsyncSession, habit_id: int, day: date
-) -> HabitCheckin | None:
+async def checkin_for_day(session: AsyncSession, habit_id: int, day: date) -> HabitCheckin | None:
     stmt = select(HabitCheckin).where(
         HabitCheckin.habit_id == habit_id, HabitCheckin.local_date == day
     )

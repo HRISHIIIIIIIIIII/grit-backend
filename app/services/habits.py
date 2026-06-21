@@ -58,9 +58,7 @@ async def delete_habit(session: AsyncSession, user: User, habit_id: int) -> None
     await session.flush()
 
 
-async def set_archived(
-    session: AsyncSession, user: User, habit_id: int, archived: bool
-) -> Habit:
+async def set_archived(session: AsyncSession, user: User, habit_id: int, archived: bool) -> Habit:
     habit = await _require_habit(session, habit_id, user)
     habit.archived = archived
     await session.flush()
@@ -97,13 +95,9 @@ async def check_in(
 
     existing = await habit_repo.checkin_for_day(session, habit.id, today)
     if existing is not None:
-        raise ConflictError(
-            "Habit already checked in for today", code="already_checked_in"
-        )
+        raise ConflictError("Habit already checked in for today", code="already_checked_in")
 
-    checkin = HabitCheckin(
-        habit_id=habit.id, user_id=user.id, local_date=today, source=source
-    )
+    checkin = HabitCheckin(habit_id=habit.id, user_id=user.id, local_date=today, source=source)
     session.add(checkin)
     await session.flush()
 

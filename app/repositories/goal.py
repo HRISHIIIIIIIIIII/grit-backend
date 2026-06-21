@@ -28,12 +28,8 @@ async def list_for_user(session: AsyncSession, user_id: int) -> list[Goal]:
     return list((await session.execute(stmt)).scalars().all())
 
 
-async def get_milestone(
-    session: AsyncSession, goal_id: int, milestone_id: int
-) -> Milestone | None:
-    stmt = select(Milestone).where(
-        Milestone.id == milestone_id, Milestone.goal_id == goal_id
-    )
+async def get_milestone(session: AsyncSession, goal_id: int, milestone_id: int) -> Milestone | None:
+    stmt = select(Milestone).where(Milestone.id == milestone_id, Milestone.goal_id == goal_id)
     return (await session.execute(stmt)).scalar_one_or_none()
 
 

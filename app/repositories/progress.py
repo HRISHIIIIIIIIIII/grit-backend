@@ -59,9 +59,7 @@ async def checkin_counts_by_category(
     return out
 
 
-async def total_checkins(
-    session: AsyncSession, user_id: int, start: date, end: date
-) -> int:
+async def total_checkins(session: AsyncSession, user_id: int, start: date, end: date) -> int:
     stmt = select(func.count()).where(
         HabitCheckin.user_id == user_id,
         HabitCheckin.local_date >= start,
@@ -70,9 +68,7 @@ async def total_checkins(
     return int((await session.execute(stmt)).scalar_one())
 
 
-async def active_day_count(
-    session: AsyncSession, user_id: int, start: date, end: date
-) -> int:
+async def active_day_count(session: AsyncSession, user_id: int, start: date, end: date) -> int:
     stmt = select(func.count(func.distinct(HabitCheckin.local_date))).where(
         HabitCheckin.user_id == user_id,
         HabitCheckin.local_date >= start,
@@ -81,9 +77,7 @@ async def active_day_count(
     return int((await session.execute(stmt)).scalar_one())
 
 
-async def perfect_day_count(
-    session: AsyncSession, user_id: int, start: date, end: date
-) -> int:
+async def perfect_day_count(session: AsyncSession, user_id: int, start: date, end: date) -> int:
     stmt = select(func.count()).where(
         XpEvent.user_id == user_id,
         XpEvent.reason == XpReason.PERFECT_DAY,

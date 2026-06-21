@@ -36,9 +36,7 @@ class AchievementView:
 async def _compute_metrics(session: AsyncSession, user: User) -> dict[str, int]:
     checkins = int(
         (
-            await session.execute(
-                select(func.count()).where(HabitCheckin.user_id == user.id)
-            )
+            await session.execute(select(func.count()).where(HabitCheckin.user_id == user.id))
         ).scalar_one()
     )
     streak = (
@@ -99,10 +97,7 @@ async def _compute_metrics(session: AsyncSession, user: User) -> dict[str, int]:
 
 async def ensure_catalog(session: AsyncSession) -> dict[str, Achievement]:
     """Upsert the code-defined catalog into the Achievement table."""
-    existing = {
-        a.code: a
-        for a in (await session.execute(select(Achievement))).scalars().all()
-    }
+    existing = {a.code: a for a in (await session.execute(select(Achievement))).scalars().all()}
     for d in CATALOG:
         row = existing.get(d.code)
         if row is None:
@@ -135,10 +130,10 @@ async def sync_achievements(session: AsyncSession, user: User) -> list[Achieveme
     links = {
         ua.achievement_id: ua
         for ua in (
-            await session.execute(
-                select(UserAchievement).where(UserAchievement.user_id == user.id)
-            )
-        ).scalars().all()
+            await session.execute(select(UserAchievement).where(UserAchievement.user_id == user.id))
+        )
+        .scalars()
+        .all()
     }
 
     newly_unlocked: list[Achievement] = []
@@ -169,9 +164,7 @@ async def sync_achievements(session: AsyncSession, user: User) -> list[Achieveme
     return newly_unlocked
 
 
-async def _notify_unlock(
-    session: AsyncSession, user: User, achievement: Achievement
-) -> None:
+async def _notify_unlock(session: AsyncSession, user: User, achievement: Achievement) -> None:
     """Dispatch an instant achievement notification (best-effort)."""
     from app.models.enums import NotificationType
     from app.services import notifications as notification_service

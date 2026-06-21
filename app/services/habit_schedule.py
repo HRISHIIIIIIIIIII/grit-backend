@@ -40,9 +40,7 @@ def is_scheduled_on(schedule: str, day: date) -> bool:
 
 def _rrule_scheduled_on(rrule: str, weekday: int) -> bool:
     body = rrule.removeprefix("RRULE:")
-    parts = dict(
-        piece.split("=", 1) for piece in body.split(";") if "=" in piece
-    )
+    parts = dict(piece.split("=", 1) for piece in body.split(";") if "=" in piece)
     freq = parts.get("FREQ", "DAILY")
     if freq == "DAILY":
         return True

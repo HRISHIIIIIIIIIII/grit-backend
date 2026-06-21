@@ -78,9 +78,7 @@ async def import_roadmap(
         session.add(phase)
         await session.flush()
         for t_index, topic_name in enumerate(parsed_phase.topics):
-            session.add(
-                Topic(phase_id=phase.id, name=topic_name, order_index=t_index)
-            )
+            session.add(Topic(phase_id=phase.id, name=topic_name, order_index=t_index))
     await session.flush()
     return roadmap
 
@@ -129,9 +127,7 @@ async def toggle_topic(
             if roadmap.is_dsa_linked:
                 dsa_credited = await _credit_dsa_habit(session, user, roadmap.id)
         else:
-            await scoring.revoke_xp_by_ref(
-                session, user, reason=XpReason.TOPIC, ref_id=topic.id
-            )
+            await scoring.revoke_xp_by_ref(session, user, reason=XpReason.TOPIC, ref_id=topic.id)
 
     phase_topics = await roadmap_repo.phase_topics(session, phase.id)
     phase_complete = bool(phase_topics) and all(t.done for t in phase_topics)
@@ -156,7 +152,5 @@ async def _credit_dsa_habit(session: AsyncSession, user: User, roadmap_id: int) 
     today = local_date(user.timezone)
     if await habit_repo.checkin_for_day(session, habit.id, today) is not None:
         return False
-    await habit_service.check_in(
-        session, user, habit.id, source=CheckinSource.ROADMAP_LINK
-    )
+    await habit_service.check_in(session, user, habit.id, source=CheckinSource.ROADMAP_LINK)
     return True

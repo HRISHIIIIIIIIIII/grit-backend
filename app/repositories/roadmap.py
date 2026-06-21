@@ -58,16 +58,12 @@ async def phase_topics(session: AsyncSession, phase_id: int) -> list[Topic]:
 
 async def all_topics(session: AsyncSession, roadmap_id: int) -> list[Topic]:
     stmt = (
-        select(Topic)
-        .join(Phase, Topic.phase_id == Phase.id)
-        .where(Phase.roadmap_id == roadmap_id)
+        select(Topic).join(Phase, Topic.phase_id == Phase.id).where(Phase.roadmap_id == roadmap_id)
     )
     return list((await session.execute(stmt)).scalars().all())
 
 
-async def linked_dsa_habit(
-    session: AsyncSession, user_id: int, roadmap_id: int
-) -> Habit | None:
+async def linked_dsa_habit(session: AsyncSession, user_id: int, roadmap_id: int) -> Habit | None:
     stmt = select(Habit).where(
         Habit.user_id == user_id,
         Habit.linked_roadmap_id == roadmap_id,

@@ -23,9 +23,7 @@ async def list_notifications(
 async def mark_read(
     notification_id: int, current_user: CurrentUser, session: DbSession
 ) -> NotificationRead:
-    notification = await notification_service.mark_read(
-        session, current_user, notification_id
-    )
+    notification = await notification_service.mark_read(session, current_user, notification_id)
     return NotificationRead.model_validate(notification)
 
 

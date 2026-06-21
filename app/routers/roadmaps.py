@@ -116,8 +116,6 @@ async def toggle_topic(
     )
 
 
-async def detail_response(
-    session: DbSession, user: CurrentUser, roadmap_id: int
-) -> RoadmapDetail:
+async def detail_response(session: DbSession, user: CurrentUser, roadmap_id: int) -> RoadmapDetail:
     roadmap = await roadmap_service.get_roadmap(session, user, roadmap_id)
     return _detail(roadmap)

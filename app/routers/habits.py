@@ -31,9 +31,7 @@ async def list_habits(
     session: DbSession,
     include_archived: bool = Query(default=False),
 ) -> list[HabitRead]:
-    rows = await habit_service.list_habits(
-        session, current_user, include_archived=include_archived
-    )
+    rows = await habit_service.list_habits(session, current_user, include_archived=include_archived)
     return [_to_read(h, streak, today) for h, streak, today in rows]
 
 
@@ -54,19 +52,13 @@ async def update_habit(
 
 
 @router.delete("/{habit_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_habit(
-    habit_id: int, current_user: CurrentUser, session: DbSession
-) -> None:
+async def delete_habit(habit_id: int, current_user: CurrentUser, session: DbSession) -> None:
     await habit_service.delete_habit(session, current_user, habit_id)
 
 
 @router.post("/{habit_id}/checkin", response_model=CheckinResult)
-async def check_in(
-    habit_id: int, current_user: CurrentUser, session: DbSession
-) -> CheckinResult:
-    checkin, xp, perfect, streak = await habit_service.check_in(
-        session, current_user, habit_id
-    )
+async def check_in(habit_id: int, current_user: CurrentUser, session: DbSession) -> CheckinResult:
+    checkin, xp, perfect, streak = await habit_service.check_in(session, current_user, habit_id)
     return CheckinResult(
         checkin=CheckinRead.model_validate(checkin),
         xp_awarded=xp,
@@ -76,23 +68,17 @@ async def check_in(
 
 
 @router.delete("/{habit_id}/checkin", status_code=status.HTTP_204_NO_CONTENT)
-async def undo_check_in(
-    habit_id: int, current_user: CurrentUser, session: DbSession
-) -> None:
+async def undo_check_in(habit_id: int, current_user: CurrentUser, session: DbSession) -> None:
     await habit_service.undo_check_in(session, current_user, habit_id)
 
 
 @router.post("/{habit_id}/archive", response_model=HabitRead)
-async def archive_habit(
-    habit_id: int, current_user: CurrentUser, session: DbSession
-) -> HabitRead:
+async def archive_habit(habit_id: int, current_user: CurrentUser, session: DbSession) -> HabitRead:
     habit = await habit_service.set_archived(session, current_user, habit_id, True)
     return _to_read(habit, 0, False)
 
 
 @router.post("/{habit_id}/restore", response_model=HabitRead)
-async def restore_habit(
-    habit_id: int, current_user: CurrentUser, session: DbSession
-) -> HabitRead:
+async def restore_habit(habit_id: int, current_user: CurrentUser, session: DbSession) -> HabitRead:
     habit = await habit_service.set_archived(session, current_user, habit_id, False)
     return _to_read(habit, 0, False)

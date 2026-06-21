@@ -76,17 +76,15 @@ async def test_goal_habit_links(client: AsyncClient) -> None:
     assert goal["habit_ids"] == [habit_id]
 
     # Update to clear the links.
-    updated = await client.patch(
-        f"/api/v1/goals/{goal['id']}", headers=h, json={"habit_ids": []}
-    )
+    updated = await client.patch(f"/api/v1/goals/{goal['id']}", headers=h, json={"habit_ids": []})
     assert updated.json()["habit_ids"] == []
 
 
 async def test_delete_goal(client: AsyncClient) -> None:
     h = await _auth(client)
-    goal_id = (
-        await client.post("/api/v1/goals", headers=h, json={"name": "Ship project"})
-    ).json()["id"]
+    goal_id = (await client.post("/api/v1/goals", headers=h, json={"name": "Ship project"})).json()[
+        "id"
+    ]
     resp = await client.delete(f"/api/v1/goals/{goal_id}", headers=h)
     assert resp.status_code == 204
     assert (await client.get("/api/v1/goals", headers=h)).json() == []

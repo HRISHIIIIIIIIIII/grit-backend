@@ -37,9 +37,7 @@ class User(Base, TimestampMixin):
     settings: Mapped[UserSettings] = relationship(
         back_populates="user", uselist=False, cascade="all, delete-orphan"
     )
-    habits: Mapped[list[Habit]] = relationship(
-        back_populates="user", cascade="all, delete-orphan"
-    )
+    habits: Mapped[list[Habit]] = relationship(back_populates="user", cascade="all, delete-orphan")
     checkins: Mapped[list[HabitCheckin]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )

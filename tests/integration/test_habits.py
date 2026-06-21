@@ -35,9 +35,7 @@ async def test_habit_crud_and_listing(client: AsyncClient) -> None:
     assert len(listing.json()) == 1
     assert listing.json()[0]["checked_in_today"] is False
 
-    patch = await client.patch(
-        f"/api/v1/habits/{habit_id}", headers=h, json={"xp_value": 40}
-    )
+    patch = await client.patch(f"/api/v1/habits/{habit_id}", headers=h, json={"xp_value": 40})
     assert patch.json()["xp_value"] == 40
 
 
@@ -99,9 +97,7 @@ async def test_archive_hides_from_default_list(client: AsyncClient) -> None:
     default = await client.get("/api/v1/habits", headers=h)
     assert default.json() == []
 
-    with_archived = await client.get(
-        "/api/v1/habits?include_archived=true", headers=h
-    )
+    with_archived = await client.get("/api/v1/habits?include_archived=true", headers=h)
     assert len(with_archived.json()) == 1
 
     await client.post(f"/api/v1/habits/{habit_id}/restore", headers=h)
@@ -130,7 +126,5 @@ async def test_cannot_touch_another_users_habit(client: AsyncClient) -> None:
     )
     other_h = {"Authorization": f"Bearer {other_login.json()['access_token']}"}
 
-    resp = await client.patch(
-        f"/api/v1/habits/{habit_id}", headers=other_h, json={"xp_value": 1}
-    )
+    resp = await client.patch(f"/api/v1/habits/{habit_id}", headers=other_h, json={"xp_value": 1})
     assert resp.status_code == 404

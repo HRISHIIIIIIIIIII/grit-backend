@@ -61,9 +61,7 @@ def _quiet_end_utc(user: User, settings: UserSettings, now: datetime) -> datetim
     assert end is not None
     end_today = datetime.combine(local.date(), end, tzinfo=local.tzinfo)
     if end_today <= local:
-        end_today = datetime.combine(
-            local.date() + timedelta(days=1), end, tzinfo=local.tzinfo
-        )
+        end_today = datetime.combine(local.date() + timedelta(days=1), end, tzinfo=local.tzinfo)
 
     return end_today.astimezone(UTC)
 
