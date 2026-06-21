@@ -112,7 +112,10 @@ def _create_user(session: Session) -> User:
         timezone="Europe/Berlin",
         identity_word="Relentless",
         xp_total=0,
-        settings=UserSettings(accent_color="#0EA47F"),
+        onboarding_completed=True,
+        pact_accepted=True,
+        focus_areas=["Fitness", "Discipline", "Learning", "Focus", "Mind"],
+        settings=UserSettings(accent_color="#0EA47F", daily_target=5),
         streak=Streak(),
     )
     session.add(user)

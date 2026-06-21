@@ -17,7 +17,7 @@ from app.core.security import (
 from app.models.streak import Streak
 from app.models.user import User, UserSettings
 from app.repositories import user as user_repo
-from app.schemas.auth import RegisterRequest, TokenPair
+from app.schemas.auth import RegisterRequest, TokenPair, UpdateMeRequest
 
 
 def _validate_timezone(tz_name: str) -> None:
@@ -25,6 +25,17 @@ def _validate_timezone(tz_name: str) -> None:
         ZoneInfo(tz_name)
     except (ZoneInfoNotFoundError, ValueError) as exc:
         raise ValidationError(f"Unknown timezone: {tz_name}") from exc
+
+
+async def update_me(session: AsyncSession, user: User, payload: UpdateMeRequest) -> User:
+    data = payload.model_dump(exclude_unset=True)
+    if "timezone" in data and data["timezone"] is not None:
+        _validate_timezone(data["timezone"])
+    for field, value in data.items():
+        if value is not None:
+            setattr(user, field, value)
+    await session.flush()
+    return user
 
 
 async def register(session: AsyncSession, payload: RegisterRequest) -> User:

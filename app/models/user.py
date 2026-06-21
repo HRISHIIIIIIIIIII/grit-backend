@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import time
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, Enum, ForeignKey, Integer, String, Time, UniqueConstraint
+from sqlalchemy import JSON, Boolean, Enum, ForeignKey, Integer, String, Time, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
@@ -33,6 +33,12 @@ class User(Base, TimestampMixin):
     identity_word: Mapped[str | None] = mapped_column(String(60), nullable=True)
     # xp_total is a cached sum of XpEvent.amount; level is DERIVED, never stored.
     xp_total: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+
+    # Onboarding state.
+    onboarding_completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    pact_accepted: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # Focus areas chosen in onboarding (list of HabitCategory values).
+    focus_areas: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
 
     settings: Mapped[UserSettings] = relationship(
         back_populates="user", uselist=False, cascade="all, delete-orphan"
@@ -78,6 +84,11 @@ class UserSettings(Base):
     public_on_leaderboards: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     quiet_hours_start: Mapped[time | None] = mapped_column(Time, nullable=True)
     quiet_hours_end: Mapped[time | None] = mapped_column(Time, nullable=True)
+
+    # Onboarding preferences.
+    daily_target: Mapped[int] = mapped_column(Integer, default=3, nullable=False)
+    # reminder_slot: morning | midday | evening
+    reminder_slot: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     # Per-type notification toggles (all default on).
     notify_streak_protection: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

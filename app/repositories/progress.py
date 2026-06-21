@@ -2,13 +2,14 @@
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.enums import XpReason
 from app.models.habit import Habit, HabitCheckin
+from app.models.roadmap import Phase, Roadmap, Topic
 from app.models.xp import XpEvent
 
 
@@ -95,4 +96,37 @@ async def xp_earned_between(
         XpEvent.created_at >= start_dt,
         XpEvent.created_at <= end_dt,
     )
+    return int((await session.execute(stmt)).scalar_one())
+
+
+async def checkin_timestamps(
+    session: AsyncSession, user_id: int, start_dt: datetime, end_dt: datetime
+) -> list[datetime]:
+    """All check-in created_at timestamps (UTC) in a window, for time-of-day bucketing."""
+    stmt = select(HabitCheckin.created_at).where(
+        HabitCheckin.user_id == user_id,
+        HabitCheckin.created_at >= start_dt,
+        HabitCheckin.created_at < end_dt,
+    )
+    return list((await session.execute(stmt)).scalars().all())
+
+
+async def topics_done_by_roadmap(
+    session: AsyncSession, user_id: int
+) -> list[tuple[int, str, int]]:
+    """(roadmap_id, title, topics_done) for each of the user's roadmaps with >0 done."""
+    stmt = (
+        select(Roadmap.id, Roadmap.title, func.count(Topic.id))
+        .select_from(Topic)
+        .join(Phase, Topic.phase_id == Phase.id)
+        .join(Roadmap, Phase.roadmap_id == Roadmap.id)
+        .where(Roadmap.user_id == user_id, Topic.done.is_(True))
+        .group_by(Roadmap.id, Roadmap.title)
+        .order_by(func.count(Topic.id).desc())
+    )
+    return [(r[0], r[1], int(r[2])) for r in (await session.execute(stmt)).all()]
+
+
+async def total_checkins_all_time(session: AsyncSession, user_id: int) -> int:
+    stmt = select(func.count()).where(HabitCheckin.user_id == user_id)
     return int((await session.execute(stmt)).scalar_one())

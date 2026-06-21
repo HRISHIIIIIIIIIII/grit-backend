@@ -11,6 +11,7 @@ from app.schemas.auth import (
     RefreshRequest,
     RegisterRequest,
     TokenPair,
+    UpdateMeRequest,
     UserPublic,
 )
 from app.services import auth as auth_service
@@ -48,8 +49,20 @@ async def logout(_: CurrentUser) -> None:
 me_router = APIRouter(tags=["Auth"])
 
 
+def _me_response(user: object) -> MeResponse:
+    base = UserPublic.model_validate(user).model_dump()
+    info = level_info(base["xp_total"])
+    return MeResponse(**base, level=info.level, level_name=info.name, xp_to_next=info.xp_to_next)
+
+
 @me_router.get("/me", response_model=MeResponse)
 async def me(current_user: CurrentUser) -> MeResponse:
-    info = level_info(current_user.xp_total)
-    base = UserPublic.model_validate(current_user).model_dump()
-    return MeResponse(**base, level=info.level, level_name=info.name, xp_to_next=info.xp_to_next)
+    return _me_response(current_user)
+
+
+@me_router.patch("/me", response_model=MeResponse)
+async def update_me(
+    payload: UpdateMeRequest, current_user: CurrentUser, session: DbSession
+) -> MeResponse:
+    user = await auth_service.update_me(session, current_user, payload)
+    return _me_response(user)

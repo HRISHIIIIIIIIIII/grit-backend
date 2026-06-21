@@ -18,6 +18,8 @@ class SettingsRead(ORMModel):
     public_on_leaderboards: bool
     quiet_hours_start: time | None
     quiet_hours_end: time | None
+    daily_target: int
+    reminder_slot: str | None
     notify_streak_protection: bool
     notify_milestone: bool
     notify_accountability: bool
@@ -36,6 +38,8 @@ class SettingsUpdate(BaseModel):
     public_on_leaderboards: bool | None = None
     quiet_hours_start: time | None = None
     quiet_hours_end: time | None = None
+    daily_target: int | None = Field(default=None, ge=1, le=8)
+    reminder_slot: str | None = Field(default=None, pattern="^(morning|midday|evening)$")
     notify_streak_protection: bool | None = None
     notify_milestone: bool | None = None
     notify_accountability: bool | None = None

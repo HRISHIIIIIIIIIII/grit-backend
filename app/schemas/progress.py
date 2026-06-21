@@ -51,6 +51,28 @@ class CategoryCount(BaseModel):
     count: int
 
 
+class TrendPoint(BaseModel):
+    label: str
+    value: int
+
+
+class TimeOfDayBucket(BaseModel):
+    label: str
+    count: int
+
+
+class VelocityItem(BaseModel):
+    roadmap_id: int
+    title: str
+    topics_done: int
+
+
+class AnalyticsRecords(BaseModel):
+    longest_streak: int
+    best_day_count: int
+    total_checkins: int
+
+
 class AnalyticsRead(BaseModel):
     period: str
     start: date
@@ -60,3 +82,8 @@ class AnalyticsRead(BaseModel):
     perfect_days: int
     xp_earned: int
     by_category: list[CategoryCount]
+    # Enriched series for the Analytics screen.
+    trend: list[TrendPoint]
+    time_of_day: list[TimeOfDayBucket]
+    velocity: list[VelocityItem]
+    records: AnalyticsRecords

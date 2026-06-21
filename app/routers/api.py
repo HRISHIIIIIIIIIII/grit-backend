@@ -14,6 +14,7 @@ from app.routers import (
     goals,
     habits,
     notifications,
+    onboarding,
     progress,
     roadmaps,
     settings,
@@ -23,6 +24,7 @@ from app.routers import (
 api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(auth.router)
 api_router.include_router(auth.me_router)
+api_router.include_router(onboarding.router)
 api_router.include_router(habits.router)
 api_router.include_router(streaks.router)
 api_router.include_router(progress.router)

@@ -40,6 +40,9 @@ class UserPublic(ORMModel):
     timezone: str
     identity_word: str | None
     xp_total: int
+    onboarding_completed: bool
+    pact_accepted: bool
+    focus_areas: list[str] | None
     created_at: datetime
 
 
@@ -47,3 +50,10 @@ class MeResponse(UserPublic):
     level: int
     level_name: str
     xp_to_next: int | None
+
+
+class UpdateMeRequest(BaseModel):
+    display_name: str | None = Field(default=None, min_length=1, max_length=120)
+    identity_word: str | None = Field(default=None, max_length=60)
+    timezone: str | None = Field(default=None, max_length=64)
+    avatar_seed: str | None = Field(default=None, max_length=120)
