@@ -164,8 +164,28 @@ async def sync_achievements(session: AsyncSession, user: User) -> list[Achieveme
                 reason=XpReason.ACHIEVEMENT,
                 ref_id=achievement.id,
             )
+            await _notify_unlock(session, user, achievement)
     await session.flush()
     return newly_unlocked
+
+
+async def _notify_unlock(
+    session: AsyncSession, user: User, achievement: Achievement
+) -> None:
+    """Dispatch an instant achievement notification (best-effort)."""
+    from app.models.enums import NotificationType
+    from app.services import notifications as notification_service
+    from app.services.mentor import EVENT_ACHIEVEMENT
+
+    await notification_service.notify_event(
+        session,
+        user,
+        ntype=NotificationType.ACHIEVEMENT,
+        event=EVENT_ACHIEVEMENT,
+        action_label="View achievements",
+        action_url="/achievements",
+        achievement=achievement.name,
+    )
 
 
 async def list_with_progress(
