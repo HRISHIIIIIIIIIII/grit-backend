@@ -57,7 +57,12 @@ docker compose up --build                              # postgres, redis, api, w
 docker compose exec api uv run python -m scripts.seed  # demo data (optional)
 ```
 
-The `api` service runs `alembic upgrade head` on boot. API at **http://localhost:8000/docs**.
+The `api` service runs `alembic upgrade head` on boot. API at **http://localhost:8010/docs**.
+
+> **Published host ports are chosen to coexist with other services:** API `8010`, Postgres
+> `5433`, Redis `6380` — so this stack runs happily alongside a Redis already on `6379` or
+> another app on `8000`. (Containers talk to each other internally on the default ports.)
+> If `docker compose up` still says *"port is already allocated"*, run the cleanup below.
 
 ---
 
@@ -87,6 +92,28 @@ uv run celery -A app.workers.celery_app.celery_app beat   --loglevel=info
 A single Beat entry runs a `sweep` every 15 minutes that fans out idempotent per-user tasks
 (streak recompute at local midnight, streak-protection nudges at ~20:00, weekly/monthly
 reviews).
+
+---
+
+## Stopping & cleaning up ports
+
+If a port is "already in use", or you want a clean slate (stale dev servers, a stray Celery
+worker, a half-started Docker stack):
+
+```bash
+# 1) Stop the Docker stack (if you used Option B)
+docker compose down                 # add -v to also wipe the Postgres volume
+
+# 2) Stop a stray Celery worker/beat started by hand
+pkill -f 'celery -A app.workers'
+
+# 3) Free the GRIT dev ports (backend 8010, frontend 5173/5174)
+for p in 8010 5173 5174; do fuser -k ${p}/tcp 2>/dev/null; done
+# (no `fuser`? use:  for p in 8010 5173 5174; do kill $(lsof -ti tcp:$p) 2>/dev/null; done )
+```
+
+> These only touch GRIT's own ports. They will **not** stop your existing Redis (`6379`) or
+> anything on `8000` — those are intentionally left alone.
 
 ---
 

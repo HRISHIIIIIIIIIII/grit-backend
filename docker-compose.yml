@@ -6,7 +6,8 @@ services:
       POSTGRES_PASSWORD: grit
       POSTGRES_DB: grit
     ports:
-      - "5432:5432"
+      # Published on 5433 to avoid clashing with a host Postgres on 5432.
+      - "5433:5432"
     volumes:
       - grit_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -18,7 +19,8 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      # Published on 6380 to avoid clashing with a host Redis on 6379.
+      - "6380:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -34,11 +36,13 @@ services:
       GRIT_CELERY_BROKER_URL: redis://redis:6379/1
       GRIT_CELERY_RESULT_BACKEND: redis://redis:6379/2
       GRIT_REDIS_URL: redis://redis:6379/0
+      GRIT_CORS_ORIGINS: http://localhost:5173
     command: >
       sh -c "uv run alembic upgrade head &&
              uv run uvicorn app.main:app --host 0.0.0.0 --port 8000"
     ports:
-      - "8000:8000"
+      # Published on host 8010 (8000 is often taken) — matches the frontend default.
+      - "8010:8000"
     depends_on:
       postgres:
         condition: service_healthy
