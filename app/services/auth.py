@@ -31,8 +31,10 @@ async def update_me(session: AsyncSession, user: User, payload: UpdateMeRequest)
     data = payload.model_dump(exclude_unset=True)
     if "timezone" in data and data["timezone"] is not None:
         _validate_timezone(data["timezone"])
+    # These may be explicitly cleared (set to null); others ignore null.
+    nullable = {"avatar_url", "identity_word"}
     for field, value in data.items():
-        if value is not None:
+        if value is not None or field in nullable:
             setattr(user, field, value)
     await session.flush()
     return user

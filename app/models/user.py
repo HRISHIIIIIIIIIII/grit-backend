@@ -5,7 +5,17 @@ from __future__ import annotations
 from datetime import time
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, Boolean, Enum, ForeignKey, Integer, String, Time, UniqueConstraint
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    Time,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base, TimestampMixin
@@ -29,6 +39,8 @@ class User(Base, TimestampMixin):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     display_name: Mapped[str] = mapped_column(String(120), nullable=False)
     avatar_seed: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    # Profile photo as a (downscaled) data URL or external URL; null = use initials avatar.
+    avatar_url: Mapped[str | None] = mapped_column(Text, nullable=True)
     timezone: Mapped[str] = mapped_column(String(64), default="Europe/Berlin", nullable=False)
     identity_word: Mapped[str | None] = mapped_column(String(60), nullable=True)
     # xp_total is a cached sum of XpEvent.amount; level is DERIVED, never stored.

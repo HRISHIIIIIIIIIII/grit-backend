@@ -37,6 +37,7 @@ class UserPublic(ORMModel):
     email: str
     display_name: str
     avatar_seed: str | None
+    avatar_url: str | None
     timezone: str
     identity_word: str | None
     xp_total: int
@@ -57,3 +58,5 @@ class UpdateMeRequest(BaseModel):
     identity_word: str | None = Field(default=None, max_length=60)
     timezone: str | None = Field(default=None, max_length=64)
     avatar_seed: str | None = Field(default=None, max_length=120)
+    # Data URL of a downscaled photo (or external URL). Capped to keep the row small.
+    avatar_url: str | None = Field(default=None, max_length=600_000)
