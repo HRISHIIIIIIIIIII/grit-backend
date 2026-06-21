@@ -14,6 +14,7 @@ class SettingsRead(ORMModel):
     theme: str
     accent_color: str
     mentor_tone: MentorTone
+    coach: str
     sound_enabled: bool
     public_on_leaderboards: bool
     quiet_hours_start: time | None
@@ -34,6 +35,7 @@ class SettingsUpdate(BaseModel):
     theme: str | None = Field(default=None, max_length=20)
     accent_color: str | None = Field(default=None, max_length=20)
     mentor_tone: MentorTone | None = None
+    coach: str | None = Field(default=None, pattern="^(atlas|raze|nova|sage|vesper)$")
     sound_enabled: bool | None = None
     public_on_leaderboards: bool | None = None
     quiet_hours_start: time | None = None

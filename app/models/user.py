@@ -80,6 +80,8 @@ class UserSettings(Base):
         default=MentorTone.HARD,
         nullable=False,
     )
+    # Selected AI coach persona: atlas | raze | nova | sage | vesper.
+    coach: Mapped[str] = mapped_column(String(20), default="atlas", nullable=False)
     sound_enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     public_on_leaderboards: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     quiet_hours_start: Mapped[time | None] = mapped_column(Time, nullable=True)
